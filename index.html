@@ -160,6 +160,22 @@
       overflow: hidden;
     }
 
+    /* Transparent-to-black fade at the very top of the section */
+    .vision-section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 280px;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(0,0,0,0.55) 35%,
+        #000 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     /* ambient glow */
     .vision-section::before {
       content: '';
