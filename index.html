@@ -21,47 +21,38 @@
     }
 
     /* ────────────────────────────────────────────
-       HERO  —  sticky scroll container
+       FIXED BACKGROUND LAYER
+       Video + text-overlay + vignette are all
+       position:fixed so they never scroll away.
+       The vision section (z-index:5) slides over
+       them as the user scrolls down.
     ──────────────────────────────────────────── */
-    .hero-scroll {
-      position: relative;
-      height: 500vh;
-    }
 
-    .hero-sticky {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      width: 100%;
-      overflow: hidden;
-      /* stacking context so mix-blend-mode composites against siblings */
-      isolation: auto;
-    }
-
-    /* ── Full-screen background video ── */
     .bg-video {
-      position: absolute;
+      position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      z-index: 1;
+      z-index: 0;
     }
 
-    /* ── Dark mask overlay — PATH text punches through via mix-blend-mode ── */
+    /*
+      Black overlay with white PATH text.
+      Both video and overlay are fixed in the same
+      stacking context, so mix-blend-mode: multiply
+      composites correctly between them:
+        black (0,0,0) × video = black  — hides video
+        white (1,1,1) × video = video  — shows video through letters
+    */
     .text-overlay {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 2;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #000;
-      /*
-        multiply: overlay_pixel × video_pixel
-          black  (0,0,0) → 0 · video = black  (hides video ✓)
-          white  (1,1,1) → 1 · video = video  (shows video through text ✓)
-      */
       mix-blend-mode: multiply;
     }
 
@@ -77,11 +68,39 @@
       white-space: nowrap;
     }
 
-    /* ── UI layer (nav, scroll hint) — above blend ── */
-    .hero-ui {
-      position: absolute;
+    .vignette {
+      position: fixed;
       inset: 0;
-      z-index: 3;
+      z-index: 2;
+      background: radial-gradient(ellipse at center,
+        transparent 40%,
+        rgba(0,0,0,0.55) 100%);
+      pointer-events: none;
+    }
+
+    /* ────────────────────────────────────────────
+       HERO SCROLL SECTION
+       Just a tall spacer that drives the scroll
+       animation. Its sticky child holds the nav.
+    ──────────────────────────────────────────── */
+    .hero-scroll {
+      position: relative;
+      height: 500vh;
+    }
+
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      /* no background — fixed video/overlay show through */
+    }
+
+    /* Nav + scroll hint — fixed so they don't move with sticky */
+    .hero-ui {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -135,38 +154,28 @@
       50%       { opacity: 0.6;  transform: translateY(-4px); }
     }
 
-    /* ── thin vignette on top of everything ── */
-    .vignette {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      background: radial-gradient(ellipse at center,
-        transparent 40%,
-        rgba(0,0,0,0.55) 100%);
-      pointer-events: none;
-    }
-
     /* ────────────────────────────────────────────
        OUR VISION SECTION
+       z-index:5 places it above the fixed video
+       and text-overlay. The gradient top uses the
+       green color at zero opacity (not the
+       `transparent` keyword) so the browser
+       interpolates through green — not black.
     ──────────────────────────────────────────── */
     .vision-section {
       position: relative;
+      z-index: 5;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 120px 40px;
-      /*
-        The gradient IS the background — transparent at the very top
-        so the video behind shows through as the section scrolls in,
-        then resolves to solid dark green.
-      */
       background: linear-gradient(
         to bottom,
-        rgba(10,40,22,0)   0px,
-        rgba(10,40,22,0.7) 120px,
-        #0a2816            280px,
-        #0a2816            100%
+        rgba(10,40,22,0)    0px,
+        rgba(10,40,22,0.85) 160px,
+        #0a2816             320px,
+        #0a2816             100%
       );
       overflow: hidden;
     }
@@ -178,7 +187,7 @@
       width: 900px;
       height: 900px;
       background: radial-gradient(circle,
-        rgba(30, 90, 50, 0.12) 0%,
+        rgba(30,90,50,0.12) 0%,
         transparent 65%);
       top: 50%;
       left: 50%;
@@ -290,6 +299,8 @@
        FOOTER
     ──────────────────────────────────────────── */
     .footer {
+      position: relative;
+      z-index: 5;
       border-top: 1px solid rgba(255,255,255,0.05);
       padding: 2rem 3rem;
       display: flex;
@@ -307,28 +318,27 @@
 <body>
 
   <!-- ═══════════════════════════════════════════
-       HERO — sticky scroll + video text mask
+       FIXED BACKGROUND — video + text mask
+       These never scroll; vision section slides
+       over them from below.
+  ═══════════════════════════════════════════ -->
+  <video class="bg-video" id="bgVideo" autoplay loop muted playsinline>
+    <source src="https://res.cloudinary.com/dv7kupisj/video/upload/v1774557564/Path_wmzffa.mp4" type="video/mp4" />
+  </video>
+
+  <div class="text-overlay" id="textOverlay">
+    <h1 class="path-title" id="pathTitle">PATH</h1>
+  </div>
+
+  <div class="vignette" id="vignette"></div>
+
+  <!-- ═══════════════════════════════════════════
+       HERO SCROLL SECTION
+       Tall spacer that drives the animation.
+       Sticky child keeps nav in place during hero.
   ═══════════════════════════════════════════ -->
   <section class="hero-scroll" id="hero">
     <div class="hero-sticky">
-
-      <!-- Background video (always full-screen underneath) -->
-      <video class="bg-video" id="bgVideo" autoplay loop muted playsinline>
-        <source src="https://res.cloudinary.com/dv7kupisj/video/upload/v1774557564/Path_wmzffa.mp4" type="video/mp4" />
-      </video>
-
-      <!--
-        Black overlay with white "PATH" text.
-        mix-blend-mode: multiply → white letters act as windows into the video.
-      -->
-      <div class="text-overlay" id="textOverlay">
-        <h1 class="path-title" id="pathTitle">PATH</h1>
-      </div>
-
-      <!-- Vignette (purely decorative depth) -->
-      <div class="vignette" id="vignette"></div>
-
-      <!-- Nav + scroll hint (fades out on scroll) -->
       <div class="hero-ui" id="heroUI">
         <nav class="nav">
           <span class="nav-logo">PATH</span>
@@ -341,12 +351,11 @@
         </nav>
         <p class="scroll-hint">Scroll to enter</p>
       </div>
-
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════
-       OUR VISION
+       OUR VISION  (z-index:5 slides over fixed layer)
   ═══════════════════════════════════════════ -->
   <section class="vision-section" id="vision">
     <div class="vision-content">
@@ -412,35 +421,25 @@
     /* ──────────────────────────────────────────────────────────
        Scroll animation — exponential text scale → full-screen video
     ────────────────────────────────────────────────────────── */
-    const hero         = document.getElementById('hero');
-    const textOverlay  = document.getElementById('textOverlay');
-    const pathTitle    = document.getElementById('pathTitle');
-    const heroUI       = document.getElementById('heroUI');
-    const vignette     = document.getElementById('vignette');
-    const visionGlass  = document.getElementById('visionGlass');
+    const hero        = document.getElementById('hero');
+    const textOverlay = document.getElementById('textOverlay');
+    const pathTitle   = document.getElementById('pathTitle');
+    const heroUI      = document.getElementById('heroUI');
+    const vignette    = document.getElementById('vignette');
+    const visionGlass = document.getElementById('visionGlass');
 
     let ticking = false;
 
-    function easeIn(t, exp) {
-      return Math.pow(t, exp);
-    }
-
     function onScroll() {
-      const scrollY   = window.scrollY;
-      const heroH     = hero.offsetHeight - window.innerHeight; // scrollable range
-      const progress  = Math.max(0, Math.min(scrollY / heroH, 1)); // 0 → 1
+      const scrollY  = window.scrollY;
+      const heroH    = hero.offsetHeight - window.innerHeight;
+      const progress = Math.max(0, Math.min(scrollY / heroH, 1));
 
-      /* ── 1. Exponential scale ──────────────────────────────
-         The text grows from 1× to ~80× as the user scrolls.
-         Using base-80 exponentiation gives a slow-start,
-         accelerating feel — camera "falls through" the A.       */
-      const MAX_SCALE = 80;
-      const scale = Math.pow(MAX_SCALE, progress);          // 1 → 80
+      /* 1. Exponential scale — text grows 1× → ~80× */
+      const scale = Math.pow(80, progress);
       pathTitle.style.transform = `scale(${scale})`;
 
-      /* ── 2. Overlay fade — "passing through the A" ─────────
-         Between 68 % and 88 % of the scroll range the overlay
-         dissolves, revealing the video in full screen.         */
+      /* 2. Overlay + vignette fade out as camera "passes through the A" */
       const FADE_START = 0.68;
       const FADE_END   = 0.88;
       let overlayAlpha = 1;
@@ -450,13 +449,10 @@
         );
       }
       textOverlay.style.opacity = overlayAlpha;
+      vignette.style.opacity    = overlayAlpha;
 
-      /* ── 3. Vignette fades with overlay ────────────────────  */
-      vignette.style.opacity = overlayAlpha;
-
-      /* ── 4. Nav + hint fades immediately on scroll ─────────  */
-      const uiAlpha = Math.max(0, 1 - progress * 6);
-      heroUI.style.opacity = uiAlpha;
+      /* 3. Nav + scroll hint fade immediately on scroll */
+      heroUI.style.opacity = Math.max(0, 1 - progress * 6);
     }
 
     window.addEventListener('scroll', () => {
@@ -469,23 +465,18 @@
     /* ──────────────────────────────────────────────────────────
        Intersection Observer — reveal Vision card on enter
     ────────────────────────────────────────────────────────── */
-    const observer = new IntersectionObserver(
+    new IntersectionObserver(
       (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
           }
         });
       },
       { threshold: 0.15 }
-    );
+    ).observe(visionGlass);
 
-    observer.observe(visionGlass);
-
-    /* ──────────────────────────────────────────────────────────
-       Ensure video plays (some browsers need a nudge)
-    ────────────────────────────────────────────────────────── */
+    /* Ensure video plays on first interaction */
     const video = document.getElementById('bgVideo');
     document.addEventListener('click', () => {
       if (video.paused) video.play();
