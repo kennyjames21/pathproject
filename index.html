@@ -156,24 +156,19 @@
       align-items: center;
       justify-content: center;
       padding: 120px 40px;
-      background: #000;
+      /*
+        The gradient IS the background — transparent at the very top
+        so the video behind shows through as the section scrolls in,
+        then resolves to solid dark green.
+      */
+      background: linear-gradient(
+        to bottom,
+        transparent        0px,
+        rgba(5,18,9,0.6)   120px,
+        #050f08            280px,
+        #050f08            100%
+      );
       overflow: hidden;
-    }
-
-    /* Transparent-to-black fade at the very top of the section */
-    .vision-section::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 280px;
-      background: linear-gradient(to bottom,
-        transparent 0%,
-        rgba(0,0,0,0.55) 35%,
-        #000 100%);
-      pointer-events: none;
-      z-index: 0;
     }
 
     /* ambient glow */
@@ -183,7 +178,7 @@
       width: 900px;
       height: 900px;
       background: radial-gradient(circle,
-        rgba(80, 90, 200, 0.07) 0%,
+        rgba(30, 90, 50, 0.12) 0%,
         transparent 65%);
       top: 50%;
       left: 50%;
@@ -303,6 +298,7 @@
       font-size: 0.75rem;
       letter-spacing: 0.05em;
       color: rgba(255,255,255,0.18);
+      background: #050f08;
     }
 
     .footer span:last-child { font-style: italic; }
