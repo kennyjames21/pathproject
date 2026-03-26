@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PATH — Built for Builders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ────────────────────────────────────────────
+       HERO  —  sticky scroll container
+    ──────────────────────────────────────────── */
+    .hero-scroll {
+      position: relative;
+      height: 500vh;
+    }
+
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      /* stacking context so mix-blend-mode composites against siblings */
+      isolation: auto;
+    }
+
+    /* ── Full-screen background video ── */
+    .bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    /* ── Dark mask overlay — PATH text punches through via mix-blend-mode ── */
+    .text-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      /*
+        multiply: overlay_pixel × video_pixel
+          black  (0,0,0) → 0 · video = black  (hides video ✓)
+          white  (1,1,1) → 1 · video = video  (shows video through text ✓)
+      */
+      mix-blend-mode: multiply;
+    }
+
+    .path-title {
+      font-size: 26vw;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      color: #fff;
+      transform-origin: center center;
+      will-change: transform;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* ── UI layer (nav, scroll hint) — above blend ── */
+    .hero-ui {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2.25rem 3rem 2.5rem;
+      pointer-events: none;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .nav-logo {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      transition: color 0.25s;
+    }
+
+    .nav-links a:hover { color: rgba(255,255,255,0.85); }
+
+    .scroll-hint {
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      animation: breathe 2.4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.25; transform: translateY(0); }
+      50%       { opacity: 0.6;  transform: translateY(-4px); }
+    }
+
+    /* ── thin vignette on top of everything ── */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      background: radial-gradient(ellipse at center,
+        transparent 40%,
+        rgba(0,0,0,0.55) 100%);
+      pointer-events: none;
+    }
+
+    /* ────────────────────────────────────────────
+       OUR VISION SECTION
+    ──────────────────────────────────────────── */
+    .vision-section {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 40px;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* ambient glow */
+    .vision-section::before {
+      content: '';
+      position: absolute;
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(circle,
+        rgba(80, 90, 200, 0.07) 0%,
+        transparent 65%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .vision-content {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      width: 100%;
+    }
+
+    /* glass card */
+    .vision-glass {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.07);
+      backdrop-filter: blur(60px);
+      -webkit-backdrop-filter: blur(60px);
+      border-radius: 28px;
+      padding: 80px;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .vision-glass.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .vision-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+      margin-bottom: 2rem;
+    }
+
+    .vision-heading {
+      font-size: clamp(2.2rem, 4.5vw, 3.75rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      color: #fff;
+      margin-bottom: 2rem;
+    }
+
+    .vision-heading em {
+      font-style: normal;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .vision-body {
+      font-size: 1.05rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.48);
+      max-width: 600px;
+      margin-bottom: 3.5rem;
+    }
+
+    .vision-divider {
+      width: 48px;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin-bottom: 3.5rem;
+    }
+
+    .vision-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+    }
+
+    @media (max-width: 680px) {
+      .vision-glass { padding: 48px 32px; }
+      .vision-pillars { grid-template-columns: 1fr; gap: 2rem; }
+      .nav-links { display: none; }
+    }
+
+    .pillar-number {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.18);
+      margin-bottom: 0.9rem;
+    }
+
+    .pillar-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: rgba(255,255,255,0.82);
+      margin-bottom: 0.6rem;
+    }
+
+    .pillar-text {
+      font-size: 0.85rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ────────────────────────────────────────────
+       FOOTER
+    ──────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.18);
+    }
+
+    .footer span:last-child { font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       HERO — sticky scroll + video text mask
+  ═══════════════════════════════════════════ -->
+  <section class="hero-scroll" id="hero">
+    <div class="hero-sticky">
+
+      <!-- Background video (always full-screen underneath) -->
+      <video class="bg-video" id="bgVideo" autoplay loop muted playsinline>
+        <source src="https://higgsfield.ai/asset/all/4196ad95-dd67-4c8c-8ea5-1d0cbb2ecd6d" type="video/mp4" />
+      </video>
+
+      <!--
+        Black overlay with white "PATH" text.
+        mix-blend-mode: multiply → white letters act as windows into the video.
+      -->
+      <div class="text-overlay" id="textOverlay">
+        <h1 class="path-title" id="pathTitle">PATH</h1>
+      </div>
+
+      <!-- Vignette (purely decorative depth) -->
+      <div class="vignette" id="vignette"></div>
+
+      <!-- Nav + scroll hint (fades out on scroll) -->
+      <div class="hero-ui" id="heroUI">
+        <nav class="nav">
+          <span class="nav-logo">PATH</span>
+          <ul class="nav-links">
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Ventures</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </nav>
+        <p class="scroll-hint">Scroll to enter</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       OUR VISION
+  ═══════════════════════════════════════════ -->
+  <section class="vision-section" id="vision">
+    <div class="vision-content">
+      <div class="vision-glass" id="visionGlass">
+
+        <p class="vision-eyebrow">Our Vision</p>
+
+        <h2 class="vision-heading">
+          The financial infrastructure<br />
+          <em>built for builders.</em>
+        </h2>
+
+        <p class="vision-body">
+          PATH exists to remove every barrier standing between a great idea and
+          its full potential. We engineer capital solutions, banking
+          infrastructure, and growth tools designed specifically for
+          entrepreneurs who are rewriting the rules of what's possible.
+        </p>
+
+        <div class="vision-divider"></div>
+
+        <div class="vision-pillars">
+          <div class="pillar">
+            <p class="pillar-number">01</p>
+            <h3 class="pillar-title">Capital Access</h3>
+            <p class="pillar-text">
+              Flexible funding solutions that move at the speed of your
+              ambition — not the pace of traditional banking.
+            </p>
+          </div>
+          <div class="pillar">
+            <p class="pillar-number">02</p>
+            <h3 class="pillar-title">Smart Banking</h3>
+            <p class="pillar-text">
+              A unified financial stack for startups: accounts, payments,
+              treasury, and cash-flow intelligence in one place.
+            </p>
+          </div>
+          <div class="pillar">
+            <p class="pillar-number">03</p>
+            <h3 class="pillar-title">Growth Engine</h3>
+            <p class="pillar-text">
+              Strategic advisory, curated networks, and tools that connect
+              your runway to the partnerships that scale companies.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <span>© 2025 PATH Financial Services, Inc.</span>
+    <span>Built for the bold.</span>
+  </footer>
+
+
+  <script>
+    /* ──────────────────────────────────────────────────────────
+       Scroll animation — exponential text scale → full-screen video
+    ────────────────────────────────────────────────────────── */
+    const hero         = document.getElementById('hero');
+    const textOverlay  = document.getElementById('textOverlay');
+    const pathTitle    = document.getElementById('pathTitle');
+    const heroUI       = document.getElementById('heroUI');
+    const vignette     = document.getElementById('vignette');
+    const visionGlass  = document.getElementById('visionGlass');
+
+    let ticking = false;
+
+    function easeIn(t, exp) {
+      return Math.pow(t, exp);
+    }
+
+    function onScroll() {
+      const scrollY   = window.scrollY;
+      const heroH     = hero.offsetHeight - window.innerHeight; // scrollable range
+      const progress  = Math.max(0, Math.min(scrollY / heroH, 1)); // 0 → 1
+
+      /* ── 1. Exponential scale ──────────────────────────────
+         The text grows from 1× to ~80× as the user scrolls.
+         Using base-80 exponentiation gives a slow-start,
+         accelerating feel — camera "falls through" the A.       */
+      const MAX_SCALE = 80;
+      const scale = Math.pow(MAX_SCALE, progress);          // 1 → 80
+      pathTitle.style.transform = `scale(${scale})`;
+
+      /* ── 2. Overlay fade — "passing through the A" ─────────
+         Between 68 % and 88 % of the scroll range the overlay
+         dissolves, revealing the video in full screen.         */
+      const FADE_START = 0.68;
+      const FADE_END   = 0.88;
+      let overlayAlpha = 1;
+      if (progress > FADE_START) {
+        overlayAlpha = 1 - Math.min(
+          (progress - FADE_START) / (FADE_END - FADE_START), 1
+        );
+      }
+      textOverlay.style.opacity = overlayAlpha;
+
+      /* ── 3. Vignette fades with overlay ────────────────────  */
+      vignette.style.opacity = overlayAlpha;
+
+      /* ── 4. Nav + hint fades immediately on scroll ─────────  */
+      const uiAlpha = Math.max(0, 1 - progress * 6);
+      heroUI.style.opacity = uiAlpha;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => { onScroll(); ticking = false; });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    /* ──────────────────────────────────────────────────────────
+       Intersection Observer — reveal Vision card on enter
+    ────────────────────────────────────────────────────────── */
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(visionGlass);
+
+    /* ──────────────────────────────────────────────────────────
+       Ensure video plays (some browsers need a nudge)
+    ────────────────────────────────────────────────────────── */
+    const video = document.getElementById('bgVideo');
+    document.addEventListener('click', () => {
+      if (video.paused) video.play();
+    }, { once: true });
+  </script>
+
+</body>
+</html>
