@@ -121,6 +121,14 @@
       text-transform: uppercase;
       color: #fff;
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .navbar-icon {
+      height: 1em;
+      width: auto;
+      display: block;
     }
 
     .navbar-links {
@@ -349,7 +357,10 @@
   ═══════════════════════════════════════════ -->
   <!-- Persistent glass navbar -->
   <header class="navbar">
-    <a class="navbar-logo" href="#">PATH</a>
+    <a class="navbar-logo" href="#">
+      <img class="navbar-icon" src="https://res.cloudinary.com/dv7kupisj/image/upload/v1774644840/path_icon_bw_es7vyc.png" alt="" />
+      PATH
+    </a>
     <ul class="navbar-links">
       <li><a href="services.html">Services</a></li>
       <li><a href="ventures.html">Ventures</a></li>
