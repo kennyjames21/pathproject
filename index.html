@@ -96,62 +96,72 @@
       /* no background — fixed video/overlay show through */
     }
 
-    /* Nav + scroll hint — fixed so they don't move with sticky */
-    .hero-ui {
+    /* ── Persistent glass navbar ── */
+    .navbar {
       position: fixed;
-      inset: 0;
-      z-index: 10;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 2.25rem 3rem 2.5rem;
-      pointer-events: none;
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      pointer-events: auto;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .nav-logo {
-      font-size: 0.9rem;
+    .navbar-logo {
+      font-size: 0.85rem;
       font-weight: 700;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.65);
+      color: #fff;
+      text-decoration: none;
     }
 
-    .nav-links {
+    .navbar-links {
       list-style: none;
       display: flex;
       gap: 2.5rem;
     }
 
-    .nav-links a {
+    .navbar-links a {
       font-size: 0.8rem;
       font-weight: 400;
       letter-spacing: 0.06em;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255, 255, 255, 0.55);
       text-decoration: none;
-      transition: color 0.25s;
+      transition: color 0.2s;
     }
 
-    .nav-links a:hover { color: rgba(255,255,255,0.85); }
+    .navbar-links a:hover { color: #fff; }
 
+    @media (max-width: 680px) {
+      .navbar-links { display: none; }
+    }
+
+    /* ── Scroll hint ── */
     .scroll-hint {
-      text-align: center;
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
       font-size: 0.7rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
+      color: rgba(255, 255, 255, 0.25);
+      pointer-events: none;
       animation: breathe 2.4s ease-in-out infinite;
     }
 
     @keyframes breathe {
-      0%, 100% { opacity: 0.25; transform: translateY(0); }
-      50%       { opacity: 0.6;  transform: translateY(-4px); }
+      0%, 100% { opacity: 0.25; transform: translateX(-50%) translateY(0); }
+      50%       { opacity: 0.6;  transform: translateX(-50%) translateY(-4px); }
     }
 
     /* ────────────────────────────────────────────
@@ -337,21 +347,23 @@
        Tall spacer that drives the animation.
        Sticky child keeps nav in place during hero.
   ═══════════════════════════════════════════ -->
+  <!-- Persistent glass navbar -->
+  <header class="navbar">
+    <a class="navbar-logo" href="#">PATH</a>
+    <ul class="navbar-links">
+      <li><a href="#">Services</a></li>
+      <li><a href="#">Ventures</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </header>
+
+  <!-- Scroll hint -->
+  <p class="scroll-hint" id="scrollHint">Scroll to enter</p>
+
+  <!-- Tall scroll spacer that drives the animation -->
   <section class="hero-scroll" id="hero">
-    <div class="hero-sticky">
-      <div class="hero-ui" id="heroUI">
-        <nav class="nav">
-          <span class="nav-logo">PATH</span>
-          <ul class="nav-links">
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Ventures</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-          </ul>
-        </nav>
-        <p class="scroll-hint">Scroll to enter</p>
-      </div>
-    </div>
+    <div class="hero-sticky"></div>
   </section>
 
   <!-- ═══════════════════════════════════════════
@@ -424,7 +436,7 @@
     const hero        = document.getElementById('hero');
     const textOverlay = document.getElementById('textOverlay');
     const pathTitle   = document.getElementById('pathTitle');
-    const heroUI      = document.getElementById('heroUI');
+    const scrollHint  = document.getElementById('scrollHint');
     const vignette    = document.getElementById('vignette');
     const visionGlass = document.getElementById('visionGlass');
 
@@ -451,8 +463,8 @@
       textOverlay.style.opacity = overlayAlpha;
       vignette.style.opacity    = overlayAlpha;
 
-      /* 3. Nav + scroll hint fade immediately on scroll */
-      heroUI.style.opacity = Math.max(0, 1 - progress * 6);
+      /* 3. Scroll hint fades immediately on scroll */
+      scrollHint.style.opacity = Math.max(0, 1 - progress * 6);
     }
 
     window.addEventListener('scroll', () => {
