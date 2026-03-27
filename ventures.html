@@ -31,7 +31,19 @@
     .navbar-links { list-style: none; display: flex; gap: 2.5rem; }
     .navbar-links a { font-size: 0.8rem; font-weight: 400; letter-spacing: 0.06em; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; }
     .navbar-links a:hover, .navbar-links a[aria-current] { color: #fff; }
-    @media (max-width: 680px) { .navbar-links { display: none; } }
+    .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform 0.25s ease, opacity 0.25s ease; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (max-width: 680px) {
+      .hamburger { display: flex; }
+      .navbar-links { display: none; flex-direction: column; position: fixed; top: 60px; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0.5rem 0; gap: 0; z-index: 19; }
+      .navbar-links.open { display: flex; }
+      .navbar-links li { border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .navbar-links li:last-child { border-bottom: none; }
+      .navbar-links a { display: block; padding: 1rem 2.5rem; font-size: 0.9rem; }
+    }
 
     /* ── Page hero ── */
     .page-hero {
@@ -156,6 +168,9 @@
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </header>
 
   <!-- Hero -->
@@ -292,6 +307,21 @@
   </footer>
 
   <script>
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.querySelector('.navbar-links');
+    hamburger.addEventListener('click', () => {
+      const isOpen = mobileNav.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+      hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    });
+    mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      mobileNav.classList.remove('open');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.setAttribute('aria-label', 'Open menu');
+    }));
+
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
