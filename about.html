@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — PATH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; height: 60px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .navbar-logo { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.35em; text-transform: uppercase; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 0.55rem; }
+    .navbar-icon { height: 1em; width: auto; display: block; }
+    .navbar-links { list-style: none; display: flex; gap: 2.5rem; }
+    .navbar-links a { font-size: 0.8rem; font-weight: 400; letter-spacing: 0.06em; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; }
+    .navbar-links a:hover, .navbar-links a[aria-current] { color: #fff; }
+    .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform 0.25s ease, opacity 0.25s ease; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (max-width: 680px) {
+      .hamburger { display: flex; }
+      .navbar-links { display: none; flex-direction: column; position: fixed; top: 60px; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0.5rem 0; gap: 0; z-index: 19; }
+      .navbar-links.open { display: flex; }
+      .navbar-links li { border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .navbar-links li:last-child { border-bottom: none; }
+      .navbar-links a { display: block; padding: 1rem 2.5rem; font-size: 0.9rem; }
+    }
+
+    /* ── Page hero ── */
+    .page-hero { padding: 160px 40px 100px; max-width: 1140px; margin: 0 auto; }
+    .eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 1.5rem; }
+    .page-title { font-size: clamp(3.5rem, 9vw, 7.5rem); font-weight: 800; letter-spacing: -0.04em; line-height: 0.95; margin-bottom: 2rem; }
+    .page-subtitle { font-size: 1.1rem; font-weight: 300; line-height: 1.75; color: rgba(255,255,255,0.45); max-width: 520px; }
+
+    /* ── Divider ── */
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 0; }
+
+    /* ── Section ── */
+    .section { padding: 90px 40px; max-width: 1140px; margin: 0 auto; }
+    .section-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 1rem; }
+    .section-title { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+
+    /* ── Story section ── */
+    .story-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: start; margin-top: 3.5rem;
+    }
+    @media (max-width: 800px) { .story-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+
+    .story-body { font-size: 1rem; font-weight: 300; color: rgba(255,255,255,0.5); line-height: 1.9; }
+    .story-body p + p { margin-top: 1.5rem; }
+
+    .story-aside {
+      background: #0a2816;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px; padding: 48px;
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .story-aside.visible { opacity: 1; transform: translateY(0); }
+    .aside-year { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.25em; color: rgba(255,255,255,0.25); margin-bottom: 0.75rem; }
+    .aside-quote { font-size: 1.25rem; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.85); font-style: italic; margin-bottom: 2rem; }
+    .aside-attr { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 0.05em; }
+
+    /* ── Values ── */
+    .values-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 3.5rem; }
+    @media (max-width: 600px) { .values-grid { grid-template-columns: 1fr; } }
+
+    .value-card {
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; padding: 44px;
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .value-card.visible { opacity: 1; transform: translateY(0); }
+    .value-card:nth-child(2) { transition-delay: 0.08s; }
+    .value-card:nth-child(3) { transition-delay: 0.16s; }
+    .value-card:nth-child(4) { transition-delay: 0.24s; }
+    .value-card:nth-child(odd)  { background: rgba(255,255,255,0.03); }
+    .value-card:nth-child(even) { background: #0a2816; }
+    .value-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.9rem; }
+    .value-text { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.45); line-height: 1.8; }
+
+    /* ── Team ── */
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3.5rem; }
+    @media (max-width: 800px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .team-grid { grid-template-columns: 1fr; } }
+
+    .team-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px; padding: 36px;
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .team-card.visible { opacity: 1; transform: translateY(0); }
+    .team-card:nth-child(2) { transition-delay: 0.07s; }
+    .team-card:nth-child(3) { transition-delay: 0.14s; }
+    .team-card:nth-child(4) { transition-delay: 0.21s; }
+    .team-card:nth-child(5) { transition-delay: 0.28s; }
+    .team-card:nth-child(6) { transition-delay: 0.35s; }
+
+    .team-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #0a2816; border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 700; letter-spacing: 0.02em;
+      color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;
+    }
+    .team-name { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .team-role { font-size: 0.8rem; font-weight: 300; color: rgba(255,255,255,0.35); margin-bottom: 1rem; letter-spacing: 0.03em; }
+    .team-bio { font-size: 0.825rem; font-weight: 300; color: rgba(255,255,255,0.4); line-height: 1.7; }
+
+    /* ── Footer ── */
+    .footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 2rem 2.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; letter-spacing: 0.05em; color: rgba(255,255,255,0.18); background: #000; }
+    .footer span:last-child { font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a class="navbar-logo" href="index.html">
+      <img class="navbar-icon" src="https://res.cloudinary.com/dv7kupisj/image/upload/v1774644840/path_icon_bw_es7vyc.png" alt="" />
+      PATH
+    </a>
+    <ul class="navbar-links">
+      <li><a href="services.html">Services</a></li>
+      <li><a href="ventures.html">Ventures</a></li>
+      <li><a href="about.html" aria-current="page">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <p class="eyebrow">Who We Are</p>
+    <h1 class="page-title">About</h1>
+    <p class="page-subtitle">We built PATH because the financial system wasn't built for the people brave enough to build something new.</p>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Story -->
+  <div class="section">
+    <p class="section-label">Our Story</p>
+    <h2 class="section-title">Built by founders,<br />for founders.</h2>
+    <div class="story-grid">
+      <div class="story-body" data-reveal>
+        <p>PATH was founded in 2019 by a group of entrepreneurs who had spent a combined 40 years fighting against financial systems that weren't designed for them. Credit decisions made by algorithms trained on data from a different era. Banking products built for Main Street businesses, not hypergrowth startups. Venture debt with terms that favored lenders over founders.</p>
+        <p>We set out to build something different — a financial services company that treats every founder as a full partner. One that makes decisions with speed and transparency. One that offers products calibrated to the actual needs of companies at every stage, from first hire to first IPO.</p>
+        <p>Today PATH serves over 2,500 companies across 34 states. We've helped founders access more than $2B in capital, launch tens of thousands of accounts, and connect with the investors and advisors who helped them scale. We're just getting started.</p>
+      </div>
+      <div class="story-aside" data-reveal>
+        <p class="aside-year">FOUNDING PRINCIPLE</p>
+        <p class="aside-quote">"Every great company started as someone's bold idea. We exist to make sure the financial system never becomes the reason that idea doesn't get to grow."</p>
+        <p class="aside-attr">— James Walker, Co-Founder & CEO</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Values -->
+  <div class="section">
+    <p class="section-label">Core Values</p>
+    <h2 class="section-title">What drives us</h2>
+    <div class="values-grid">
+      <div class="value-card" data-reveal>
+        <h3 class="value-title">Founder First</h3>
+        <p class="value-text">Every product decision, every policy, every hire is evaluated through one lens: does this make life better for the founders we serve? When in doubt, we choose the founder.</p>
+      </div>
+      <div class="value-card" data-reveal>
+        <h3 class="value-title">Radical Transparency</h3>
+        <p class="value-text">We believe founders deserve to know exactly why a decision was made — especially a no. Clear terms, honest timelines, and no hidden fees — ever.</p>
+      </div>
+      <div class="value-card" data-reveal>
+        <h3 class="value-title">Speed as Respect</h3>
+        <p class="value-text">Moving slowly costs founders money and momentum. We've engineered our processes around the principle that a fast, honest answer is almost always better than a slow, careful one.</p>
+      </div>
+      <div class="value-card" data-reveal>
+        <h3 class="value-title">Long-Term Thinking</h3>
+        <p class="value-text">We don't optimize for the transaction. We build relationships. Our best clients have been with us through multiple companies, and that loyalty is the metric we care most about.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Team -->
+  <div class="section">
+    <p class="section-label">Leadership</p>
+    <h2 class="section-title">The team</h2>
+    <div class="team-grid">
+      <div class="team-card" data-reveal>
+        <div class="team-avatar">JW</div>
+        <div class="team-name">James Walker</div>
+        <div class="team-role">Co-Founder & CEO</div>
+        <p class="team-bio">Previously founded two fintech companies and served as VP of Lending at a top-10 US bank. 18 years in financial services.</p>
+      </div>
+      <div class="team-card" data-reveal>
+        <div class="team-avatar">MC</div>
+        <div class="team-name">Maya Chen</div>
+        <div class="team-role">Co-Founder & CTO</div>
+        <p class="team-bio">Former engineering lead at Stripe and Plaid. Built payment infrastructure processing $30B+ annually.</p>
+      </div>
+      <div class="team-card" data-reveal>
+        <div class="team-avatar">DR</div>
+        <div class="team-name">David Reyes</div>
+        <div class="team-role">Chief Risk Officer</div>
+        <p class="team-bio">20 years in credit risk modeling. Pioneered ML-driven underwriting at two of the largest US credit card issuers.</p>
+      </div>
+      <div class="team-card" data-reveal>
+        <div class="team-avatar">SP</div>
+        <div class="team-name">Sarah Park</div>
+        <div class="team-role">Head of Ventures</div>
+        <p class="team-bio">GP at two fintech funds before joining PATH. Led investments in 40+ companies, 6 of which achieved unicorn status.</p>
+      </div>
+      <div class="team-card" data-reveal>
+        <div class="team-avatar">TN</div>
+        <div class="team-name">Thomas Nkosi</div>
+        <div class="team-role">Chief Product Officer</div>
+        <p class="team-bio">Helped scale three B2B SaaS products from zero to $100M ARR. Obsessed with reducing friction in financial workflows.</p>
+      </div>
+      <div class="team-card" data-reveal>
+        <div class="team-avatar">LH</div>
+        <div class="team-name">Laura Hoffman</div>
+        <div class="team-role">General Counsel</div>
+        <p class="team-bio">15 years navigating banking regulation, fintech licensing, and securities law at Latham & Watkins and in-house.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2025 PATH Financial Services, Inc.</span>
+    <span>Built for the bold.</span>
+  </footer>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.querySelector('.navbar-links');
+    hamburger.addEventListener('click', () => {
+      const isOpen = mobileNav.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+      hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    });
+    mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      mobileNav.classList.remove('open');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.setAttribute('aria-label', 'Open menu');
+    }));
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
