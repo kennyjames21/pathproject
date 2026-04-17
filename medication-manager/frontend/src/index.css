@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 17px;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl
+           transition-colors duration-150 focus:outline-none focus:ring-4 focus:ring-blue-300
+           disabled:opacity-50 disabled:cursor-not-allowed text-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-xl
+           border-2 border-gray-300 transition-colors duration-150 focus:outline-none
+           focus:ring-4 focus:ring-gray-200 disabled:opacity-50 text-lg;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl
+           transition-colors duration-150 focus:outline-none focus:ring-4 focus:ring-red-300 text-lg;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-200 p-6;
+  }
+
+  .input-field {
+    @apply w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-lg
+           focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+           transition-colors placeholder-gray-400;
+  }
+
+  .label {
+    @apply block text-lg font-semibold text-gray-700 mb-2;
+  }
+
+  .badge-major {
+    @apply bg-red-100 text-red-800 border border-red-300 px-3 py-1 rounded-full text-base font-semibold;
+  }
+
+  .badge-moderate {
+    @apply bg-orange-100 text-orange-800 border border-orange-300 px-3 py-1 rounded-full text-base font-semibold;
+  }
+
+  .badge-minor {
+    @apply bg-yellow-100 text-yellow-800 border border-yellow-300 px-3 py-1 rounded-full text-base font-semibold;
+  }
+}
